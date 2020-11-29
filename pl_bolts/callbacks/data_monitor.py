@@ -4,7 +4,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from pytorch_lightning import Callback, LightningModule, Trainer
-from pytorch_lightning.loggers import TensorBoardLogger, WandbLogger
+from pytorch_lightning.loggers import TensorBoardLogger, WandbLogger, TestTubeLogger
 from pytorch_lightning.utilities import rank_zero_warn
 from pytorch_lightning.utilities.apply_func import apply_to_collection
 from torch import Tensor
@@ -20,6 +20,7 @@ class DataMonitorBase(Callback):
 
     supported_loggers = (
         TensorBoardLogger,
+        TestTubeLogger,
         WandbLogger,
     )
 
@@ -81,7 +82,7 @@ class DataMonitorBase(Callback):
         """
         logger = self._trainer.logger
         tensor = tensor.detach().cpu()
-        if isinstance(logger, TensorBoardLogger):
+        if isinstance(logger, (TensorBoardLogger, TestTubeLogger)):
             logger.experiment.add_histogram(
                 tag=name, values=tensor, global_step=self._trainer.global_step
             )
